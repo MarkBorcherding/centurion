@@ -18,6 +18,18 @@ module Centurion::DeployDSL
     set(:hosts, current)
   end
 
+  def before_stopping_container(&block)
+    current = fetch(:before_stopping_container, [])
+    current << block
+    set(:before_stopping_container, current)
+  end
+
+  def after_container_running(&block)
+    current = fetch(:after_container_running, [])
+    current << block
+    set(:after_container_running, current)
+  end
+
   def memory(memory)
     service_under_construction.memory = memory
   end

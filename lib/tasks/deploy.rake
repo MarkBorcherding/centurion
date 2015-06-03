@@ -87,6 +87,7 @@ namespace :deploy do
   # - remote: stop
   task :stop do
     on_each_docker_host do |server|
+      fetch(:before_stopping_container, []).each {|b| b.call(server,defined_service)}
       stop_containers(server, defined_service, fetch(:stop_timeout, 30))
     end
   end
@@ -98,6 +99,7 @@ namespace :deploy do
   task :start_new do
     on_each_docker_host do |server|
       start_new_container(server, defined_service, defined_restart_policy)
+      fetch(:after_container_running, []).each {|b| b.call(server,defined_service)}
     end
   end
 
@@ -111,6 +113,7 @@ namespace :deploy do
     on_each_docker_host do |server|
       service = defined_service
 
+      fetch(:before_stopping_container, []).each {|b| b.call(server,defined_service)}
       stop_containers(server, service, fetch(:stop_timeout, 30))
 
       container = start_new_container(server, service, defined_restart_policy)
@@ -127,6 +130,7 @@ namespace :deploy do
         )
       end
 
+      fetch(:after_container_running, []).each {|b| b.call(server,defined_service)}
       wait_for_load_balancer_check_interval
     end
   end
