@@ -109,7 +109,8 @@ module Centurion::DeployDSL
         fetch(:project),
         image:    fetch(:image),
         hostname: fetch(:container_hostname),
-        dns:      fetch(:custom_dns)
+        dns:      fetch(:custom_dns),
+        tag:      fetch(:tag)
       )
     )
     set(:service, service)

@@ -117,16 +117,8 @@ describe Centurion::DeployDSL do
     expect(DeployDSLTest.defined_service.image).to eq('ubuntu')
   end
 
-  context 'without tag' do
-    it 'uses the latest tag if not tag is provided' do
-      expect(DeployDSLTest.defined_service.tag).to eq('latest')
-    end
-  end
-
-  context 'with tag' do
-    it 'has the tag for the container if it exist' do
-      DeployDSLTest.tag '1.2.3'
-      expect(DeployDSLTest.defined_service.tag).to eq('1.2.3')
-    end
+  it 'gets the tag' do
+    DeployDSLTest.tag '1.2.3'
+    expect(DeployDSLTest.defined_service.tag).to eq('1.2.3')
   end
 end

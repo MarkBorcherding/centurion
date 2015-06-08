@@ -17,7 +17,7 @@ module Centurion
       Service.new(name).tap do |s|
         s.image    = definition[:image]
         s.dns      = definition[:dns]
-        s.tag      = definition[:tag] || 'latest'
+        s.tag      = definition[:tag]
 
         definition.fetch(:volumes, []).each do |port|
           s.add_volume(port[:host_volume], port[:container_volume])

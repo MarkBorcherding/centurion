@@ -26,7 +26,7 @@ opts = Trollop::options do
   opt :environment,      "environment (production, staging...)", type: String, required: true,  short: '-e'
   opt :action,           'action (deploy, list...)',             type: String, default: 'list', short: '-a'
   opt :image,            'image (yourco/project...)',            type: String, short: '-i'
-  opt :tag,              'tag (latest...)',                      type: String, short: '-t'
+  opt :tag,              'tag (latest...)',                      type: String, short: '-t', default: 'latest'
   opt :hosts,            'hosts, comma separated',               type: String, short: '-h'
   opt :docker_path,      'path to docker executable',            type: String, default: 'docker', short: '-d'
   opt :no_pull,          'Skip the pull_image step',             type: :flag,  default: false, short: '-n'
@@ -38,6 +38,7 @@ end
 set_current_environment(opts[:environment].to_sym)
 set :project, opts[:project]
 set :environment, opts[:environment]
+set :tag,   opts[:tag]
 
 # Load the per-project config and execute the task for the current environment
 projects_dir = File.join(Dir.getwd(), 'config', 'centurion')
@@ -53,7 +54,6 @@ invoke("environment:#{opts[:environment]}")
 
 # Override the config with command line values if given
 set :image, opts[:image] if opts[:image]
-set :tag,   opts[:tag] if opts[:tag]
 set :hosts, opts[:hosts].split(",") if opts[:hosts]
 set :name,  opts[:project].gsub(/_/, '-')
 
@@ -65,8 +65,6 @@ if opts[:override_env]
   end
 end
 
-# Default tag should be "latest"
-set :tag, 'latest' unless any?(:tag)
 set :docker_registry, Centurion::DockerRegistry::OFFICIAL_URL unless any?(:docker_registry)
 
 # Specify a path to docker executable
