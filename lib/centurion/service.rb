@@ -2,8 +2,7 @@ require 'socket'
 
 module Centurion
   class Service
-
-    attr_accessor :command, :dns, :image, :name
+    attr_accessor :command, :dns, :image, :name, :tag
     attr_reader :memory, :cpu_shares, :env_vars, :volumes, :port_bindings
 
     def initialize(name)
@@ -11,12 +10,14 @@ module Centurion
       @env_vars = {}
       @volumes = []
       @port_bindings = []
+      @tag = 'latest'
     end
 
     def self.from_hash(name, definition)
       Service.new(name).tap do |s|
         s.image    = definition[:image]
         s.dns      = definition[:dns]
+        s.tag      = definition[:tag] || 'latest'
 
         definition.fetch(:volumes, []).each do |port|
           s.add_volume(port[:host_volume], port[:container_volume])
@@ -59,13 +60,9 @@ module Centurion
       @cpu_shares = shares
     end
 
-    def image=(image)
-      @image = image
-    end
-
     def build_config(server_hostname, &block)
       container_config = {}.tap do |c|
-        c['Image'] = image
+        c['Image'] = "#{image}:#{tag}"
         c['Hostname'] = block.call(server_hostname) if block_given?
         c['Cmd'] = command if command
         c['Memory'] = memory if memory

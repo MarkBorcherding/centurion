@@ -70,11 +70,20 @@ module Centurion::DeployDSL
    set(:health_check, method)
   end
 
+  def image(image)
+    set :image, image
+  end
+
+  def tag(tag)
+    set :tag, tag.to_s
+  end
+
   def defined_service
     fetch(:service,
       Centurion::Service.from_hash(
         fetch(:project),
         image:    fetch(:image),
+        tag:      fetch(:tag),
         hostname: fetch(:container_hostname),
         dns:      fetch(:custom_dns)
       )

@@ -85,6 +85,7 @@ describe Centurion::Service do
   end
 
   context 'building a container configuration' do
+    let(:service) do
       service = Centurion::Service.new(:redis)
       service.image = 'http://registry.hub.docker.com/library/redis'
       service.command = ['redis-server', '--appendonly', 'yes']
@@ -93,10 +94,12 @@ describe Centurion::Service do
       service.add_env_vars(SLAVE_OF: '127.0.0.2')
       service.add_port_bindings(8000, 6379, 'tcp', '10.0.0.1')
       service.add_volume('/volumes/redis.8000', '/data')
+      service
+    end
 
     it 'builds a valid docker container configuration' do
       expect(service.build_config('example.com')).to eq({
-        'Image' => 'http://registry.hub.docker.com/library/redis',
+        'Image' => 'http://registry.hub.docker.com/library/redis:latest',
         'Cmd' => ['redis-server', '--appendonly', 'yes'],
         'Memory' => 1024,
         'CpuShares' => 512,
@@ -110,9 +113,14 @@ describe Centurion::Service do
       })
     end
 
+    it 'appends the tag when provided' do
+      service.tag = '1.2.3'
+      expect(service.build_config('example.com')['Image']).to eq "#{service.image}:#{service.tag}"
+    end
+
     it 'overrides the default hostname when passed a block' do
       expect(service.build_config('example.com') { |s| "host.#{s}" }).to eq({
-        'Image' => 'http://registry.hub.docker.com/library/redis',
+        'Image' => 'http://registry.hub.docker.com/library/redis:latest',
         'Hostname' => 'host.example.com',
         'Cmd' => ['redis-server', '--appendonly', 'yes'],
         'Memory' => 1024,
