@@ -72,10 +72,12 @@ module Centurion::DeployDSL
 
   def image(image)
     set :image, image
+    service_under_construction.image = image
   end
 
   def tag(tag)
-    set :tag, tag.to_s
+    set :tag, tag
+    service_under_construction.tag = tag
   end
 
   def defined_service
