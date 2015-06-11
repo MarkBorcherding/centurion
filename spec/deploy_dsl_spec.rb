@@ -28,6 +28,37 @@ describe Centurion::DeployDSL do
     expect(DeployDSLTest.defined_service.command).to equal(command)
   end
 
+  shared_examples_for 'it has a DSL method for' do |name|
+    let(:value) { double :value }
+    it "has a DSL helper method for #{name}" do
+      expect(DeployDSLTest).to receive(:set).with(name, value)
+      DeployDSLTest.send(name, value)
+    end
+  end
+
+  [:image,
+   :tag,
+   :custom_dns,
+   :container_hostname,
+   :container_image_name,
+   :status_endpoint,
+   :tlsverify,
+   :tlscacert,
+   :tlscert,
+   :tlskey,
+   :aws_access_key_id,
+   :aws_secret_key,
+   :s3_bucket_key,
+   :s3_region].each do |name|
+    it_behaves_like 'it has a DSL method for', name
+   end
+
+  it 'sets container_name as name' do
+    value = double :value
+    DeployDSLTest.container_name value
+    expect(DeployDSLTest.fetch(:name)).to eq(value)
+  end
+
   it 'adds new env_vars to the existing ones, as strings' do
     DeployDSLTest.env_vars('SHAKESPEARE' => 'Hamlet')
     DeployDSLTest.env_vars('DICKENS' => 'David Copperfield',

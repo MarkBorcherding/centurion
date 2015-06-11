@@ -15,7 +15,7 @@ tools directly so you can use anything they currently support via the normal
 registry mechanism.
 
 If you haven't been using a registry, you should read up on how to do that
-before trying to deploy anything with Centurion.  
+before trying to deploy anything with Centurion.
 
 Commercial Docker Registry Providers:
 - Docker, Inc. [provides repositories](https://index.docker.io/), and hosts the
@@ -106,7 +106,7 @@ would go into `config/centurion/radio-radio.rake`:
 ```ruby
 namespace :environment do
   task :common do
-    set :image, 'example.com/newrelic/radio-radio'
+    image 'example.com/newrelic/radio-radio'
     host 'docker-server-1.example.com'
     host 'docker-server-2.example.com'
   end
@@ -148,7 +148,7 @@ You can cause your container to be started with a specific DNS server
 IP address (the equivalent of `docker run --dns 172.17.42.1 ...`) like this:
 ```ruby
   task :production => :common do
-    set :custom_dns, '172.17.42.1'
+    custom_dns '172.17.42.1'
     # ...
   end
 ```
@@ -167,7 +167,7 @@ deploy a project:
 
 ```ruby
   task :common do
-    set :name, 'backend'
+    container_name 'backend'
     # ...
   end
 ```
@@ -181,14 +181,14 @@ a lot of situations, but it might not be good for yours. If you need to have
 a specific hostname, you can ask Centurion to do that:
 
 ```ruby
-set :container_hostname, 'yourhostname'
+container_hostname 'yourhostname'
 ```
 
 That will make *all* of your containers named 'yourhostname'. If you want to do
 something more dynamic, you can pass a `Proc` or a lambda like this:
 
 ```ruby
-set :container_hostname, ->(hostname) { "#{hostname}.example.com" }
+container_hostname ->(hostname) { "#{hostname}.example.com" }
 ```
 
 The lambda will be passed the current server's hostname. So, this example will
@@ -199,7 +199,7 @@ deployment.
 can do the following:
 
 ```ruby
-set :container_hostname, ->(hostname) { hostname }
+container_hostname ->(hostname) { hostname }
 ```
 
 That will cause the container hostname to match the server's hostname.
@@ -240,7 +240,7 @@ You just need to enable the tls mode as the following:
 
 ```ruby
   task :production => :common do
-    set :tlsverify, true
+    tlsverify true
     # ...
   end
 ```
@@ -254,9 +254,9 @@ You have to set the following keys:
 
 ```ruby
   task :production => :common do
-    set :tlscacert, '/usr/local/certs/ca.pem'
-    set :tlscert, '/usr/local/certs/ssl.crt'
-    set :tlskey, '/usr/local/certs/ssl.key'
+    tlscacert '/usr/local/certs/ca.pem'
+    tlscert '/usr/local/certs/ssl.crt'
+    tlskey '/usr/local/certs/ssl.key'
     # ...
   end
 ```
@@ -305,7 +305,7 @@ end
 
 task :production => :common do
   set_current_environment(:production)
-  set :status_endpoint, "/_cluster/health?wait_for_status=green&wait_for_nodes=2"
+  status_endpoint "/_cluster/health?wait_for_status=green&wait_for_nodes=2"
   health_check method(:cluster_green?)
   host_port 9200, container_port: 9200
   host 'es-01.example.com'
@@ -331,9 +331,9 @@ are the same everywhere. Settings are per-project.
    an individual container to come up before giving up as a failure. Defaults
    to 24 attempts.
  * `rolling_deploy_skip_ports` => Either a single port, or an array of ports
-   that should be skipped for status checks. By default status checking assumes 
-   an HTTP server is on the other end and if you are deploying a container where some 
-   ports are not HTTP services, this allows you to only health check the ports 
+   that should be skipped for status checks. By default status checking assumes
+   an HTTP server is on the other end and if you are deploying a container where some
+   ports are not HTTP services, this allows you to only health check the ports
    that are. The default is an empty array. If you have non-HTTP services that you
    want to check, see Custom Health Checks in the previous section.
 
@@ -391,14 +391,14 @@ Centurion needs to have access to some registry in order to pull images to
 remote Docker servers. This needs to be either a hosted registry (public or
 private), or [Dogestry](https://github.com/dogestry/dogestry).
 
-#### Access to the registry 
+#### Access to the registry
 
 If you are not using either Dogestry, or the public registry, you may need to
 provide authentication credentials.  Centurion needs to access the Docker
 registry hosting your images directly to retrive image ids and tags. This is
 supported in both the config file and also as command line arguments.
 
-The command line arguments are: 
+The command line arguments are:
  * `--registry-user` => The username to pass to the registry
  * `--registry-password` => The password
 
@@ -430,11 +430,11 @@ use Dogestry is pretty trivial:
 ```ruby
 namespace :environment do
   task :common do
-    registry :dogestry                       # Required
-    set :aws_access_key_id, 'abc123'         # Required
-    set :aws_secret_key, 'xyz'               # Required
-    set :s3_bucket, 'docker-images-bucket'   # Required
-    set :s3_region, 'us-east-1'              # Optional
+    registry :dogestry                 # Required
+    aws_access_key_id 'abc123'         # Required
+    aws_secret_key 'xyz'               # Required
+    s3_bucket 'docker-images-bucket'   # Required
+    s3_region 'us-east-1'              # Optional
   end
 end
 ```

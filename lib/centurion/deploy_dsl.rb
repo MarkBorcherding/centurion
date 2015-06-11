@@ -92,6 +92,29 @@ module Centurion::DeployDSL
     Centurion::Service::RestartPolicy.new(fetch(:restart_policy_name, 'on-failure'), fetch(:restart_policy_max_retry_count, 10))
   end
 
+  def container_name(value)
+    set :name, value
+  end
+
+  [:image,
+   :tag,
+   :custom_dns,
+   :container_hostname,
+   :container_image_name,
+   :status_endpoint,
+   :tlsverify,
+   :tlscacert,
+   :tlscert,
+   :tlskey,
+   :aws_access_key_id,
+   :aws_secret_key,
+   :s3_bucket_key,
+   :s3_region].each do |name|
+     define_method(name)do |value|
+       set name, value
+     end
+   end
+
   private
 
   def service_under_construction
