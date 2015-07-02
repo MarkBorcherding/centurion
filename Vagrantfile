@@ -21,6 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     web.vm.network 'private_network', ip: '10.11.11.112'
   end
 
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
   config.vm.provision 'shell', inline: <<-SHELL
     sudo apt-get update
     sudo apt-get install wget aufs-tools

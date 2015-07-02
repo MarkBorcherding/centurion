@@ -84,7 +84,7 @@ describe Centurion::DockerServer do
             {"Id" => "789", "Names" => ["/centurion-3234567890abcd"], "Status" => "Exited 1 mins ago"},
             {"Id" => "918", "Names" => ["/fbomb-3234567890abcd"], "Status" => "Exited 1 mins ago"},
         ]
-      allow(server).to receive(:ps).and_return(inspected_containers)
+        allow(server).to receive(:ps).with(all: true).and_return(inspected_containers)
 
       expect(server.old_containers_for_name('centurion').map { |c| c['Id'] }).to eq(["123", "789"])
     end

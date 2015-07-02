@@ -5,9 +5,8 @@ namespace :environment do
     host_port 6379, container_port: 6379
   end
 
-  desc 'Staging environment'
-  task staging: :common do
-    set_current_environment(:staging)
+  task simple: :common do
+    set_current_environment(:simple)
   end
 
   task rename_container: :common do
